@@ -1,3 +1,3 @@
 default:
-	g++ src/*.cpp -o prog 
+	g++ src/*.cpp -o prog -I inc 
 

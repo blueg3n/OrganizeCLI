@@ -1,0 +1,18 @@
+{
+    "formats": {
+            "images": [".gif", ".png", ".jpg", ".jpeg", ".webp", ".avif", ".tiff", ".tif", ".bmp", ".heic", ".heif"]
+        ,
+        
+            "docs": [".pdf", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".odt", ".ods", ".odp", ".txt", ".rtf", ".csv"]
+        ,
+        
+            "media": [".mp4", ".mkv", ".avi", ".mov", ".webm", ".mp3", ".wav", ".flac", ".aac", ".m4a"]
+        ,
+        
+            "cmprs": [".zip", ".rar", ".7z", ".tar", ".gz", ".tgz"]
+        ,
+        
+            "execs": [".exe", ".msi", ".dmg", ".pkg", ".apk", ".aab", ".deb", ".rpm"]
+        
+    }
+}

@@ -3,9 +3,11 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <sstream>
+#include <fstream>
 #include <filesystem>
+#include <nlohmann/json.hpp>
 using namespace std;
+using namespace nlohmann;
 namespace fs = filesystem;
 
 enum FileType {
@@ -17,12 +19,8 @@ enum FileType {
     NUN
 };
 
-string imageExtensions[] = {".gif", ".png", ".jpg", ".jpeg", ".webp", ".avif", ".tiff", ".tif", ".bmp", ".heic", ".heif"};
-string docsExtensions[] = {".pdf", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".odt", ".ods", ".odp", ".txt", ".rtf", ".csv"};
-string mediaExtensions[] = {".mp4", ".mkv", ".avi", ".mov", ".webm", ".mp3", ".wav", ".flac", ".aac", ".m4a"};
-string cmprsExtensions[] = {".zip", ".rar", ".7z", ".tar", ".gz", ".tgz"};
-string execsExtensions[] = {".exe", ".msi", ".dmg", ".pkg", ".apk", ".aab", ".deb", ".rpm"};
-string* allExtensions[] = {imageExtensions, docsExtensions, mediaExtensions, cmprsExtensions, execsExtensions};
+vector<string> imageExtensions, docsExtensions, mediaExtensions, cmprsExtensions, execsExtensions;  
+vector<vector<string>> allExtensions;
 
 struct LFile {
     string name;
@@ -31,11 +29,37 @@ struct LFile {
     void getType();
 };
 
-void LFile::getType() {
-    string* extensionType;
+bool loadFormats() {
+    ifstream configFile("config/formats.json");
+    if (!configFile.is_open()) {
+        cerr << "Cannot open config/formats.json\n";
+        return false;
+    }
 
-    for (string* ext : allExtensions) {
-        for (int i = 0; i < ext->size(); i++) {
+    json data = json::parse(configFile);
+    const json& formats = data["formats"];
+    
+    imageExtensions = formats.at("images").get<vector<string>>();
+    docsExtensions  = formats.at("docs").get<vector<string>>();
+    mediaExtensions = formats.at("media").get<vector<string>>();
+    cmprsExtensions = formats.at("cmprs").get<vector<string>>();
+    execsExtensions = formats.at("execs").get<vector<string>>();
+    
+    allExtensions = {
+        imageExtensions,
+        docsExtensions,
+        mediaExtensions,
+        cmprsExtensions,
+        execsExtensions
+    };
+    
+    return true;
+}
+void LFile::getType() {
+    vector<string> extensionType;
+
+    for (vector<string> ext : allExtensions) {
+        for (int i = 0; i < ext.size(); i++) {
             if (extension == ext[i]) {
                 extensionType = ext;
             }
@@ -129,6 +153,11 @@ bool moveFiles(vector<LFile> files, string folderPath) {
 }
 
 bool organize(string folderPath) {
+    if (!loadFormats()) {
+        cerr << "Error: Couldnt load config file for formats!\n";
+        return false;
+    }
+
     vector<LFile> dirFiles;
     dirFiles = extractFiles(folderPath);
     
